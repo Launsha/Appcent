@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pusat Mini App Futuristik</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        neon: {
+                            blue: '#00f0ff',
+                            pink: '#ff00f0',
+                            purple: '#b400ff',
+                            green: '#00ff9d',
+                        },
+                        dark: {
+                            900: '#0a0a1a',
+                            800: '#121230',
+                            700: '#1a1a45',
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'neon-glow': 'neonGlow 1.5s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        neonGlow: {
+                            '0%': { 'text-shadow': '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #00f0ff, 0 0 20px #00f0ff' },
+                            '100%': { 'text-shadow': '0 0 10px #fff, 0 0 15px #00f0ff, 0 0 20px #00f0ff, 0 0 25px #00f0ff' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap');
+        
+        * {
+            transition: background-color 0.3s ease, color 0.2s ease, transform 0.3s ease;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f5ff;
+        }
+        
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .app-card {
+            transform-style: preserve-3d;
+            transform: perspective(1000px);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+        }
+        
+        .app-card:hover {
+            transform: perspective(1000px) translateY(-5px) rotateX(3deg) rotateY(3deg);
+            box-shadow: 0 5px 20px rgba(0, 240, 255, 0.4);
+        }
+        
+        .neon-border {
+            position: relative;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .neon-border::before {
+            content: '';
+            position: absolute;
+            z-index: -2;
+            left: -50%;
+            top: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, 
+                transparent, 
+                transparent, 
+                #00f0ff, 
+                transparent, 
+                transparent);
+            animation: rotateBorder 4s linear infinite;
+            opacity: 0.5;
+        }
+        
+        .neon-border::after {
+            content: '';
+            position: absolute;
+            z-index: -1;
+            inset: 2px;
+            background: inherit;
+            border-radius: inherit;
+        }
+        
+        @keyframes rotateBorder {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .modal {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px) scale(0.95);
+        }
+        
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0) scale(1);
+        }
+        
+        .theme-switch-wrapper {
+            position: relative;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .theme-switch {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #00f0ff, #b400ff);
+            border-radius: 15px;
+            cursor: pointer;
+        }
+        
+        .theme-switch:after {
+            content: '';
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: white;
+            top: 1px;
+            left: 1px;
+            transition: transform 0.3s ease;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        }
+        
+        .theme-switch.active:after {
+            transform: translateX(30px);
+        }
+        
+        .dark .theme-switch:after {
+            background: #0a0a1a;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-dark-900 text-gray-800 dark:text-gray-200 min-h-screen">
+    <!-- Header -->
+    <header class="py-6 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-neon-blue/10 to-transparent opacity-30"></div>
+        <div class="container mx-auto relative z-10">
+            <div class="flex justify-between items-center">
+                <h1 class="text-3xl md:text-4xl font-bold font-orbitron bg-clip-text text-transparent bg-gradient-to-r from-neon-blue to-neon-pink neon-glow">
+                    <i class="fas fa-cubes mr-3"></i>APP CENTER
+                </h1>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="theme-switch-wrapper">
+                        <div class="theme-switch" id="themeSwitch"></div>
+                    </div>
+                    <button id="addAppBtn" class="px-4 py-2 bg-neon-purple hover:bg-neon-purple/90 text-white rounded-lg font-medium flex items-center shadow-lg hover:shadow-neon-purple/50">
+                        <i class="fas fa-plus mr-2"></i> Tambah App
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Grid Container -->
+        <div id="appsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Apps will be loaded here -->
+        </div>
+        
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-20">
+            <div class="mx-auto max-w-md">
+                <div class="inline-block p-6 bg-neon-blue/10 rounded-full mb-6">
+                    <i class="fas fa-box-open text-5xl text-neon-blue"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">Tidak ada Mini App</h3>
+                <p class="text-gray-500 dark:text-gray-400 mb-6">Tambahkan Mini App pertamamu untuk memulai koleksi!</p>
+                <button id="addFirstAppBtn" class="px-6 py-3 bg-neon-purple hover:bg-neon-purple/90 text-white rounded-lg font-medium flex items-center mx-auto shadow-lg hover:shadow-neon-purple/50">
+                    <i class="fas fa-plus mr-2"></i> Tambah Mini App
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit App Modal -->
+    <div id="appModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-dark-800 rounded-xl shadow-2xl max-w-md w-full p-6 relative neon-border">
+            <button id="closeModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            
+            <h2 class="text-2xl font-bold mb-6 font-orbitron text-neon-blue" id="modalTitle">Tambah Mini App</h2>
+            
+            <form id="appForm" class="space-y-4">
+                <input type="hidden" id="appId">
+                
+                <div>
+                    <label for="appName" class="block text-sm font-medium mb-2 dark:text-gray-300">Nama Mini App</label>
+                    <input type="text" id="appName" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue dark:bg-dark-700 outline-none">
+                </div>
+                
+                <div>
+                    <label for="appImage" class="block text-sm font-medium mb-2 dark:text-gray-300">URL Gambar/Logo</label>
+                    <input type="url" id="appImage" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue dark:bg-dark-700 outline-none">
+                </div>
+                
+                <div>
+                    <label for="appLink" class="block text-sm font-medium mb-2 dark:text-gray-300">Link Mini App</label>
+                    <input type="url" id="appLink" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-neon-blue focus:border-neon-blue dark:bg-dark-700 outline-none">
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" id="cancelBtn" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-700">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-neon-blue hover:bg-neon-blue/90 text-white rounded-lg font-medium">
+                        Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-dark-800 rounded-xl shadow-2xl max-w-md w-full p-6 relative neon-border">
+            <h2 class="text-xl font-bold mb-4 font-orbitron text-neon-pink">Konfirmasi</h2>
+            <p id="confirmMessage" class="mb-6">Apakah Anda yakin ingin menghapus mini app ini?</p>
+            <div class="flex justify-end space-x-3">
+                <button id="confirmCancel" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-dark-700">
+                    Batal
+                </button>
+                <button id="confirmDelete" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium">
+                    Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const themeSwitch = document.getElementById('themeSwitch');
+            const addAppBtn = document.getElementById('addAppBtn');
+            const addFirstAppBtn = document.getElementById('addFirstAppBtn');
+            const appsGrid = document.getElementById('appsGrid');
+            const emptyState = document.getElementById('emptyState');
+            const appModal = document.getElementById('appModal');
+            const confirmModal = document.getElementById('confirmModal');
+            const closeModal = document.getElementById('closeModal');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const appForm = document.getElementById('appForm');
+            const modalTitle = document.getElementById('modalTitle');
+            const confirmCancel = document.getElementById('confirmCancel');
+            const confirmDelete = document.getElementById('confirmDelete');
+            const confirmMessage = document.getElementById('confirmMessage');
+            
+            // State
+            let apps = JSON.parse(localStorage.getItem('miniApps')) || [];
+            let currentAppId = null;
+            let isEditMode = false;
+            
+            // Theme Switcher
+            function initTheme() {
+                const isDark = localStorage.getItem('theme') === 'dark' || 
+                              (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                    themeSwitch.classList.add('active');
+                }
+            }
+            
+            initTheme();
+            
+            themeSwitch.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                themeSwitch.classList.toggle('active');
+                
+                const isDark = document.documentElement.classList.contains('dark');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            });
+            
+            // Modal Functions
+            function showModal(editMode = false, appData = null) {
+                isEditMode = editMode;
+                
+                if (editMode && appData) {
+                    modalTitle.textContent = 'Edit Mini App';
+                    document.getElementById('appId').value = appData.id;
+                    document.getElementById('appName').value = appData.name;
+                    document.getElementById('appImage').value = appData.image;
+                    document.getElementById('appLink').value = appData.link;
+                } else {
+                    modalTitle.textContent = 'Tambah Mini App';
+                    document.getElementById('appId').value = '';
+                    document.getElementById('appName').value = '';
+                    document.getElementById('appImage').value = '';
+                    document.getElementById('appLink').value = '';
+                }
+                
+                appModal.classList.add('active');
+            }
+            
+            function hideModal() {
+                appModal.classList.remove('active');
+            }
+            
+            function showConfirmModal(message, callback) {
+                confirmMessage.textContent = message;
+                confirmModal.classList.add('active');
+                
+                const handleConfirm = () => {
+                    callback();
+                    confirmModal.classList.remove('active');
+                    confirmDelete.removeEventListener('click', handleConfirm);
+                };
+                
+                confirmDelete.addEventListener('click', handleConfirm);
+            }
+            
+            function hideConfirmModal() {
+                confirmModal.classList.remove('active');
+            }
+            
+            // Event Listeners
+            addAppBtn.addEventListener('click', () => showModal());
+            addFirstAppBtn.addEventListener('click', () => showModal());
+            closeModal.addEventListener('click', hideModal);
+            cancelBtn.addEventListener('click', hideModal);
+            confirmCancel.addEventListener('click', hideConfirmModal);
+            
+            // Form Submission
+            appForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const appData = {
+                    id: isEditMode ? document.getElementById('appId').value : Date.now().toString(),
+                    name: document.getElementById('appName').value.trim(),
+                    image: document.getElementById('appImage').value.trim(),
+                    link: document.getElementById('appLink').value.trim()
+                };
+                
+                if (isEditMode) {
+                    // Update existing app
+                    const index = apps.findIndex(app => app.id === appData.id);
+                    if (index !== -1) {
+                        apps[index] = appData;
+                        saveApps();
+                    }
+                } else {
+                    // Add new app
+                    apps.push(appData);
+                    saveApps();
+                }
+                
+                hideModal();
+                renderApps();
+            });
+            
+            // Save apps to localStorage
+            function saveApps() {
+                localStorage.setItem('miniApps', JSON.stringify(apps));
+            }
+            
+            // Render apps grid
+            function renderApps() {
+                if (apps.length === 0) {
+                    appsGrid.innerHTML = '';
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+                
+                emptyState.classList.add('hidden');
+                appsGrid.innerHTML = '';
+                
+                apps.forEach(app => {
+                    const appCard = document.createElement('div');
+                    appCard.className = 'app-card bg-white dark:bg-dark-700 rounded-xl overflow-hidden shadow-md hover:shadow-lg flex flex-col border border-gray-200 dark:border-dark-600 h-full transform transition-all duration-300 hover:scale-105';
+                    
+                    appCard.innerHTML = `
+                        <div class="relative h-40 overflow-hidden bg-gradient-to-br from-neon-blue/10 to-neon-purple/10 flex items-center justify-center">
+                            <img src="${app.image}" alt="${app.name}" class="w-20 h-20 object-contain float rounded-full border-2 border-white dark:border-dark-800 shadow-md">
+                        </div>
+                        <div class="p-4 flex-grow flex flex-col">
+                            <h3 class="text-lg font-semibold mb-2 truncate">${app.name}</h3>
+                            <div class="mt-auto flex justify-between space-x-2">
+                                <a href="${app.link}" target="_blank" class="flex-1 px-3 py-2 bg-neon-blue hover:bg-neon-blue/90 text-white text-center rounded-md text-sm font-medium transition-all duration-300 hover:shadow-md hover:shadow-neon-blue/30">
+                                    <i class="fas fa-external-link-alt mr-1"></i> Buka
+                                </a>
+                                <button class="edit-btn px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-md text-sm font-medium transition-all duration-300 hover:shadow-md hover:shadow-amber-500/30" data-id="${app.id}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="delete-btn px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md text-sm font-medium transition-all duration-300 hover:shadow-md hover:shadow-red-500/30" data-id="${app.id}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    appsGrid.appendChild(appCard);
+                });
+                
+                // Add event listeners to edit and delete buttons
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const appId = btn.getAttribute('data-id');
+                        const appToEdit = apps.find(app => app.id === appId);
+                        if (appToEdit) showModal(true, appToEdit);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const appId = btn.getAttribute('data-id');
+                        const appToDelete = apps.find(app => app.id === appId);
+                        
+                        if (appToDelete) {
+                            showConfirmModal(`Apakah Anda yakin ingin menghapus "${appToDelete.name}"?`, () => {
+                                apps = apps.filter(app => app.id !== appId);
+                                saveApps();
+                                renderApps();
+                            });
+                        }
+                    });
+                });
+            }
+            
+            // Initial render
+            renderApps();
+            
+            // Close modals on outside click
+            [appModal, confirmModal].forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
