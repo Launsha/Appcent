@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pusat Mini App - Futuristik</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            light: '#3b82f6',
+                            dark: '#1e40af'
+                        },
+                        secondary: {
+                            light: '#10b981',
+                            dark: '#047857'
+                        },
+                        accent: {
+                            light: '#f59e0b',
+                            dark: '#b45309'
+                        },
+                        dark: {
+                            bg: '#0f172a',
+                            card: '#1e293b',
+                            text: '#f8fafc'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'neon-glow': 'neon-glow 2s alternate infinite',
+                        'neon-flicker': 'neon-flicker 3s alternate infinite'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        },
+                        'neon-glow': {
+                            '0%': { 'text-shadow': '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #0073e6, 0 0 20px #0073e6' },
+                            '100%': { 'text-shadow': '0 0 7px #fff, 0 0 14px #fff, 0 0 21px #0073e6, 0 0 28px #0073e6' }
+                        },
+                        'neon-flicker': {
+                            '0%, 19%, 21%, 23%, 25%, 54%, 56%, 100%': { 
+                                opacity: 1,
+                                'text-shadow': '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #0073e6, 0 0 20px #0073e6, 0 0 30px #0073e6'
+                            },
+                            '20%, 24%, 55%': { 
+                                opacity: 0.6,
+                                'text-shadow': 'none'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/css">
+        .glass-effect {
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            background-color: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.125);
+        }
+        
+        .gradient-border {
+            position: relative;
+            border: double 2px transparent;
+            border-radius: 0.5rem;
+            background-image: linear-gradient(rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.8)), 
+                              linear-gradient(90deg, #3b82f6, #10b981, #f59e0b);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+        }
+        
+        .gradient-border:hover {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .neon-text {
+            text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #0073e6, 0 0 20px #0073e6;
+            animation: neon-glow 2s alternate infinite;
+        }
+        
+        .flicker {
+            animation: neon-flicker 3s alternate infinite;
+        }
+        
+        .btn-glow {
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-glow:hover {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+            transform: translateY(-2px);
+        }
+        
+        .app-card {
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+        
+        .app-card:hover {
+            transform: scale(1.05) translateZ(10px);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+            z-index: 10;
+        }
+        
+        .holographic-effect {
+            background: linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(16,185,129,0.1) 50%, rgba(245,158,11,0.1) 100%);
+        }
+        
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+        
+        @media (max-width: 640px) {
+            .app-card {
+                width: 100%;
+                margin-right: 0;
+            }
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.3);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(#3b82f6, #10b981);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-dark-bg via-dark-card to-dark-bg text-gray-100 transition-colors duration-300">
+    <!-- Header -->
+    <header class="glass-effect sticky top-0 z-50 w-full py-4 px-6 flex justify-between items-center border-b border-gray-700 shadow-lg">
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-rocket text-3xl text-primary-light flicker"></i>
+            <h1 class="text-2xl font-bold neon-text">Pusat Mini App</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+            <button id="theme-toggle" class="p-2 rounded-full bg-dark-card hover:bg-primary-dark focus:outline-none transition-all duration-300 btn-glow">
+                <i id="theme-icon" class="fas fa-moon text-xl text-accent-light"></i>
+            </button>
+            <button id="add-app-btn" class="px-4 py-2 bg-primary-light hover:bg-primary-dark rounded-lg font-medium transition-all duration-300 btn-glow flex items-center space-x-2">
+                <i class="fas fa-plus"></i>
+                <span>Tambah App</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold mb-4 neon-text">Mini App Collection</h2>
+            <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+                Temukan dan kelola berbagai mini aplikasi favorit Anda dalam satu tempat.
+                Tambahkan, edit, atau hapus aplikasi sesuai kebutuhan Anda.
+            </p>
+        </div>
+
+        <!-- App Grid -->
+        <div id="app-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 mb-12">
+            <!-- Apps will be dynamically added here -->
+        </div>
+
+        <!-- No Apps Placeholder -->
+        <div id="no-apps" class="text-center py-16">
+            <div class="inline-block p-6 rounded-full bg-dark-card mb-6">
+                <i class="fas fa-folder-open text-5xl text-primary-light floating"></i>
+            </div>
+            <h3 class="text-2xl font-bold mb-2">Belum ada Mini App</h3>
+            <p class="text-gray-300 mb-6">Tambahkan Mini App pertama Anda untuk memulai</p>
+            <button id="add-first-app-btn" class="px-6 py-3 bg-primary-light hover:bg-primary-dark rounded-lg font-medium transition-all duration-300 btn-glow">
+                <i class="fas fa-plus mr-2"></i> Tambah App Pertama
+            </button>
+        </div>
+    </main>
+
+    <!-- Add App Modal -->
+    <div id="add-app-modal" class="fixed inset-0 flex items-center justify-center z-50 modal-overlay hidden opacity-0 transition-opacity duration-300">
+        <div class="glass-effect gradient-border w-full max-w-md mx-4 p-6 rounded-lg transform transition-all duration-300 scale-95">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-primary-light">Tambah Mini App Baru</h3>
+                <button id="close-modal" class="text-gray-300 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form id="app-form" class="space-y-6">
+                <input type="hidden" id="app-id" value="">
+                
+                <div class="space-y-2">
+                    <label for="app-name" class="block text-sm font-medium text-gray-300">Nama App</label>
+                    <input type="text" id="app-name" required class="w-full px-4 py-2 bg-dark-card border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light" placeholder="Nama aplikasi">
+                </div>
+                
+                <div class="space-y-2">
+                    <label for="app-url" class="block text-sm font-medium text-gray-300">URL App</label>
+                    <input type="url" id="app-url" required class="w-full px-4 py-2 bg-dark-card border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-light" placeholder="https://example.com">
+                </div>
+                
+                <div class="space-y-2">
+                    <label for="app-image" class="block text-sm font-medium text-gray-300">Logo App</label>
+                    <div class="flex items-center space-x-4">
+                        <div id="image-preview" class="w-16 h-16 rounded-lg bg-dark-card border border-gray-700 flex items-center justify-center overflow-hidden">
+                            <i class="fas fa-image text-2xl text-gray-500"></i>
+                            <img id="preview-img" src="" class="hidden w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <input type="file" id="app-image" accept="image/*" class="hidden">
+                            <button type="button" id="upload-btn" class="w-full px-4 py-2 bg-dark-card border border-gray-700 rounded-lg hover:bg-primary-dark transition-colors duration-300">
+                                Pilih Gambar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-4 pt-4">
+                    <button type="button" id="cancel-btn" class="px-4 py-2 border border-gray-700 rounded-lg hover:bg-dark-card transition-colors duration-300">
+                        Batal
+                    </button>
+                    <button type="submit" id="submit-btn" class="px-6 py-2 bg-primary-light hover:bg-primary-dark rounded-lg font-medium transition-colors duration-300 btn-glow">
+                        Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-modal" class="fixed inset-0 flex items-center justify-center z-50 modal-overlay hidden opacity-0 transition-opacity duration-300">
+        <div class="glass-effect gradient-border w-full max-w-md mx-4 p-6 rounded-lg transform transition-all duration-300 scale-95">
+            <div class="text-center">
+                <i class="fas fa-exclamation-triangle text-4xl text-accent-light mb-4"></i>
+                <h3 class="text-2xl font-bold mb-4" id="confirm-title">Hapus Mini App?</h3>
+                <p class="text-gray-300 mb-6" id="confirm-message">Apakah Anda yakin ingin menghapus aplikasi ini? Tindakan ini tidak dapat dibatalkan.</p>
+                <div class="flex justify-center space-x-4">
+                    <button id="confirm-cancel" class="px-6 py-2 border border-gray-700 rounded-lg hover:bg-dark-card transition-colors duration-300">
+                        Batal
+                    </button>
+                    <button id="confirm-action" class="px-6 py-2 bg-red-500 hover:bg-red-700 rounded-lg font-medium transition-colors duration-300">
+                        Ya, Hapus
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Notification -->
+    <div id="success-notification" class="fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-3 z-50 transform translate-y-8 opacity-0 transition-all duration-300">
+        <i class="fas fa-check-circle"></i>
+        <span id="success-message">Aplikasi berhasil ditambahkan!</span>
+    </div>
+
+    <script>
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const body = document.body;
+        
+        // Check for saved theme preference or use preferred color scheme
+        const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        if (savedTheme === 'light') {
+            body.classList.remove('dark');
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark');
+            const isDark = body.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            themeIcon.classList.toggle('fa-sun');
+            themeIcon.classList.toggle('fa-moon');
+        });
+
+        // Modal Handling
+        const addAppModal = document.getElementById('add-app-modal');
+        const confirmModal = document.getElementById('confirm-modal');
+        const addAppBtn = document.getElementById('add-app-btn');
+        const addFirstAppBtn = document.getElementById('add-first-app-btn');
+        const closeModal = document.getElementById('close-modal');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const confirmCancel = document.getElementById('confirm-cancel');
+        
+        // Function to show modal
+        function showModal(modal) {
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('div').classList.remove('scale-95');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Function to hide modal
+        function hideModal(modal) {
+            modal.classList.add('opacity-0');
+            modal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+        
+        // Event listeners for modals
+        [addAppBtn, addFirstAppBtn].forEach(btn => {
+            btn.addEventListener('click', () => {
+                resetForm();
+                showModal(addAppModal);
+            });
+        });
+        
+        [closeModal, cancelBtn].forEach(btn => {
+            btn.addEventListener('click', () => hideModal(addAppModal));
+        });
+        
+        confirmCancel.addEventListener('click', () => hideModal(confirmModal));
+        
+        // Close modals when clicking outside
+        [addAppModal, confirmModal].forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    hideModal(modal);
+                }
+            });
+        });
+
+        // Image Upload Preview
+        const uploadBtn = document.getElementById('upload-btn');
+        const appImage = document.getElementById('app-image');
+        const previewImg = document.getElementById('preview-img');
+        const imagePreview = document.getElementById('image-preview');
+        
+        uploadBtn.addEventListener('click', () => appImage.click());
+        
+        appImage.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    previewImg.classList.remove('hidden');
+                    imagePreview.querySelector('i').classList.add('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Mini Apps Data and CRUD Operations
+        let apps = [];
+        let currentEditId = null;
+        let currentDeleteId = null;
+        
+        // Initialize apps from localStorage
+        function loadApps() {
+            const savedApps = localStorage.getItem('mini-apps');
+            if (savedApps) {
+                apps = JSON.parse(savedApps);
+                renderApps();
+            }
+            checkEmptyState();
+        }
+        
+        // Save apps to localStorage
+        function saveApps() {
+            localStorage.setItem('mini-apps', JSON.stringify(apps));
+            saveToGitHub();
+        }
+        
+        // Save apps to GitHub (simulated - would require GitHub API in real implementation)
+        function saveToGitHub() {
+            // In a real implementation, you would use the GitHub API here
+            console.log("Data would be saved to GitHub in a real implementation");
+            // This is where you would:
+            // 1. Get an authentication token
+            // 2. Use the GitHub API to update the editapp.json file
+        }
+        
+        // Render apps grid
+        function renderApps() {
+            const appGrid = document.getElementById('app-grid');
+            appGrid.innerHTML = '';
+            
+            apps.forEach(app => {
+                const appCard = document.createElement('div');
+                appCard.className = 'app-card gradient-border p-6 rounded-lg flex flex-col items-center text-center h-64 relative overflow-hidden group hover:shadow-lg transition-all duration-300';
+                
+                // Holographic effect
+                const hologram = document.createElement('div');
+                hologram.className = 'absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity duration-300 background-animate';
+                hologram.style.background = 'linear-gradient(135deg, rgba(59,130,246,0.2) 0%, rgba(16,185,129,0.2) 50%, rgba(245,158,11,0.2) 100%)';
+                appCard.appendChild(hologram);
+                
+                // App content
+                const appContent = document.createElement('div');
+                appContent.className = 'relative z-10 flex flex-col items-center h-full w-full justify-between';
+                
+                // App image
+                const appImgWrapper = document.createElement('div');
+                appImgWrapper.className = 'w-16 h-16 rounded-full bg-dark-card border border-gray-700 flex items-center justify-center overflow-hidden mb-4 hover:shadow-lg transition-shadow duration-300';
+                
+                if (app.image) {
+                    const appImg = document.createElement('img');
+                    appImg.src = app.image;
+                    appImg.className = 'w-full h-full object-cover';
+                    appImg.alt = app.name;
+                    appImgWrapper.appendChild(appImg);
+                } else {
+                    const defaultIcon = document.createElement('i');
+                    defaultIcon.className = 'fas fa-cube text-2xl text-primary-light';
+                    appImgWrapper.appendChild(defaultIcon);
+                }
+                
+                // App info
+                const appInfo = document.createElement('div');
+                appInfo.className = 'flex-1 flex flex-col justify-center w-full';
+                
+                const appName = document.createElement('h3');
+                appName.className = 'text-xl font-bold mb-2 text-white';
+                appName.textContent = app.name;
+                
+                const appLink = document.createElement('a');
+                appLink.href = app.url;
+                appLink.target = '_blank';
+                appLink.rel = 'noopener noreferrer';
+                appLink.className = 'inline-block px-4 py-2 bg-primary-dark hover:bg-primary-light rounded-lg text-sm font-medium transition-colors duration-300 btn-glow';
+                appLink.textContent = 'Buka App';
+                
+                // Action buttons
+                const actionBtns = document.createElement('div');
+                actionBtns.className = 'absolute top-3 right-3 space-x-2 flex';
+                
+                const editBtn = document.createElement('button');
+                editBtn.className = 'p-2 bg-yellow-500 hover:bg-yellow-600 rounded-full text-white transition-colors duration-300 opacity-0 group-hover:opacity-100';
+                editBtn.innerHTML = '<i class="fas fa-edit"></i>';
+                editBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    editApp(app.id);
+                });
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'p-2 bg-red-500 hover:bg-red-600 rounded-full text-white transition-colors duration-300 opacity-0 group-hover:opacity-100';
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    confirmDelete(app.id, app.name);
+                });
+                
+                actionBtns.appendChild(editBtn);
+                actionBtns.appendChild(deleteBtn);
+                
+                // Build app card
+                appInfo.appendChild(appName);
+                appInfo.appendChild(appLink);
+                appContent.appendChild(appImgWrapper);
+                appContent.appendChild(appInfo);
+                appContent.appendChild(actionBtns);
+                appCard.appendChild(appContent);
+                
+                appCard.addEventListener('click', () => {
+                    window.open(app.url, '_blank');
+                });
+                
+                appGrid.appendChild(appCard);
+            });
+            
+            checkEmptyState();
+        }
+        
+        // Check if no apps and show empty state
+        function checkEmptyState() {
+            const noApps = document.getElementById('no-apps');
+            if (apps.length === 0) {
+                noApps.classList.remove('hidden');
+            } else {
+                noApps.classList.add('hidden');
+            }
+        }
+        
+        // Reset form
+        function resetForm() {
+            document.getElementById('app-form').reset();
+            document.getElementById('app-id').value = '';
+            previewImg.src = '';
+            previewImg.classList.add('hidden');
+            imagePreview.querySelector('i').classList.remove('hidden');
+            currentEditId = null;
+            document.getElementById('submit-btn').textContent = 'Simpan';
+        }
+        
+        // Add or update app
+        function saveApp(e) {
+            e.preventDefault();
+            
+            const appId = document.getElementById('app-id').value;
+            const name = document.getElementById('app-name').value.trim();
+            const url = document.getElementById('app-url').value.trim();
+            const imageFile = appImage.files[0];
+            
+            // Validate inputs
+            if (!name || !url) {
+                showNotification('error', 'Nama dan URL aplikasi harus diisi');
+                return;
+            }
+            
+            // Handle image
+            let imageData = '';
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imageData = e.target.result;
+                    completeSave(appId, name, url, imageData);
+                };
+                reader.readAsDataURL(imageFile);
+            } else if (currentEditId && !imageFile) {
+                // Keep existing image if editing and no new image is selected
+                const existingApp = apps.find(app => app.id === currentEditId);
+                imageData = existingApp?.image || '';
+                completeSave(appId, name, url, imageData);
+            } else {
+                completeSave(appId, name, url, imageData);
+            }
+        }
+        
+        function completeSave(appId, name, url, image) {
+            if (appId) {
+                // Update existing app
+                const index = apps.findIndex(app => app.id === appId);
+                if (index !== -1) {
+                    apps[index] = { id: appId, name, url, image };
+                    showNotification('success', 'Aplikasi berhasil diperbarui');
+                }
+            } else {
+                // Add new app
+                const newApp = {
+                    id: Date.now().toString(),
+                    name,
+                    url,
+                    image
+                };
+                apps.unshift(newApp);
+                showNotification('success', 'Aplikasi berhasil ditambahkan');
+            }
+            
+            saveApps();
+            renderApps();
+            hideModal(addAppModal);
+        }
+        
+        // Edit app
+        function editApp(id) {
+            const app = apps.find(app => app.id === id);
+            if (app) {
+                currentEditId = id;
+                document.getElementById('app-id').value = id;
+                document.getElementById('app-name').value = app.name;
+                document.getElementById('app-url').value = app.url;
+                document.getElementById('submit-btn').textContent = 'Perbarui';
+                
+                if (app.image) {
+                    previewImg.src = app.image;
+                    previewImg.classList.remove('hidden');
+                    imagePreview.querySelector('i').classList.add('hidden');
+                }
+                
+                showModal(addAppModal);
+            }
+        }
+        
+        // Confirm delete
+        function confirmDelete(id, name) {
+            currentDeleteId = id;
+            document.getElementById('confirm-title').textContent = `Hapus ${name}?`;
+            document.getElementById('confirm-message').textContent = `Apakah Anda yakin ingin menghapus aplikasi "${name}"? Tindakan ini tidak dapat dibatalkan.`;
+            showModal(confirmModal);
+        }
+        
+        // Delete app
+        function deleteApp() {
+            apps = apps.filter(app => app.id !== currentDeleteId);
+            saveApps();
+            renderApps();
+            hideModal(confirmModal);
+            showNotification('success', 'Aplikasi berhasil dihapus');
+        }
+        
+        // Show notification
+        function showNotification(type, message) {
+            const notification = document.getElementById('success-notification');
+            notification.querySelector('#success-message').textContent = message;
+            
+            if (type === 'success') {
+                notification.classList.remove('bg-red-500');
+                notification.classList.add('bg-green-500');
+                notification.querySelector('i').className = 'fas fa-check-circle';
+            } else {
+                notification.classList.remove('bg-green-500');
+                notification.classList.add('bg-red-500');
+                notification.querySelector('i').className = 'fas fa-exclamation-circle';
+            }
+            
+            notification.classList.remove('translate-y-8', 'opacity-0');
+            
+            setTimeout(() => {
+                notification.classList.add('translate-y-8', 'opacity-0');
+            }, 3000);
+        }
+        
+        // Event Listeners
+        document.getElementById('app-form').addEventListener('submit', saveApp);
+        document.getElementById('confirm-action').addEventListener('click', deleteApp);
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadApps();
+            
+            // Add some sample data if empty (for demo purposes)
+            if (apps.length === 0) {
+                // Uncomment to add sample apps
+                // apps = [
+                //     {
+                //         id: '1',
+                //         name: 'Weather App',
+                //         url: 'https://weather.com',
+                //         image: ''
+                //     },
+                //     {
+                //         id: '2',
+                //         name: 'To-Do List',
+                //         url: 'https://todo.com',
+                //         image: ''
+                //     },
+                //     {
+                //         id: '3',
+                //         name: 'Calculator',
+                //         url: 'https://calculator.com',
+                //         image: ''
+                //     }
+                // ];
+                // saveApps();
+                // renderApps();
+            }
+        });
+    </script>
+</body>
+</html>
